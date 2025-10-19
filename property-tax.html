@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>재산세 계산기 - 주택 재산세 자동 계산</title>
+    <meta name="description" content="주택 재산세 간편 계산기. 공시가격으로 재산세 자동 계산. 2025년 최신 세율 적용.">
+    <meta name="keywords" content="재산세, 재산세 계산기, 주택 재산세, 아파트 재산세, 공시가격">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #667eea;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        nav a:hover, nav a.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .calculator {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 3px solid #667eea;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            background: #f0f7ff;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .result-label {
+            color: #666;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .info-box table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .info-box th, .info-box td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box th {
+            background: #bbdefb;
+            font-weight: 600;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-top: 20px;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav a {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 부동산세금 계산기</h1>
+            <p class="subtitle">2025년 최신 세율로 정확하게 계산하세요</p>
+        </header>
+
+        <nav>
+            <a href="index.html">취득세</a>
+            <a href="capital-gains-tax.html">양도소득세</a>
+            <a href="property-tax.html" class="active">재산세</a>
+            <a href="registration-tax.html">등록세</a>
+            <a href="real-estate-guide.html">세금 가이드</a>
+        </nav>
+
+        <div class="content">
+            <h2>재산세 계산기</h2>
+            <p style="color: #666; margin: 20px 0;">주택 공시가격으로 재산세를 간편하게 계산합니다.</p>
+
+            <div class="calculator">
+                <div class="form-group">
+                    <label>주택 공시가격 (원)</label>
+                    <input type="number" id="officialPrice" placeholder="예: 500000000">
+                    <small style="color: #666; display: block; margin-top: 8px;">
+                        * 아파트는 공동주택공시가격, 단독/다가구주택은 개별주택공시가격을 입력하세요
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>주택 유형</label>
+                    <select id="houseType">
+                        <option value="house">주택 (일반)</option>
+                        <option value="separate">별장</option>
+                    </select>
+                </div>
+
+                <button onclick="calculate()">재산세 계산하기</button>
+            </div>
+
+            <div class="result" id="result">
+                <h3 style="margin-bottom: 20px; color: #667eea;">계산 결과</h3>
+                <div class="result-item">
+                    <span class="result-label">공시가격</span>
+                    <span class="result-value" id="resultPrice">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">공정시장가액비율</span>
+                    <span class="result-value">60%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">과세표준</span>
+                    <span class="result-value" id="resultTaxBase">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">재산세</span>
+                    <span class="result-value" id="resultPropertyTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">지방교육세</span>
+                    <span class="result-value" id="resultEducationTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">도시지역분</span>
+                    <span class="result-value" id="resultUrbanTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">연간 총 세액</span>
+                    <span class="result-value" id="resultTotal">-</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>2025년 주택 재산세율</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>과세표준</th>
+                            <th>세율</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>6,000만원 이하</td>
+                            <td>0.1%</td>
+                        </tr>
+                        <tr>
+                            <td>6,000만원 초과 ~ 1.5억원 이하</td>
+                            <td>0.15%</td>
+                        </tr>
+                        <tr>
+                            <td>1.5억원 초과 ~ 3억원 이하</td>
+                            <td>0.25%</td>
+                        </tr>
+                        <tr>
+                            <td>3억원 초과</td>
+                            <td>0.4%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: #555;">
+                    * 별장은 일반세율의 4배 적용 (0.4% ~ 1.6%)<br>
+                    * 공정시장가액비율: 60% (2025년 기준)
+                </p>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ 유의사항</h4>
+                <p>• 재산세는 매년 7월(주택 1/2), 9월(주택 1/2) 납부합니다</p>
+                <p>• 공시가격은 매년 4월 공시되며 변동될 수 있습니다</p>
+                <p>• 1세대 1주택자는 고령자·장기보유 공제 혜택이 있을 수 있습니다</p>
+                <p>• 정확한 세액은 해당 지자체에 문의하시기 바랍니다</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ko-KR').format(num);
+        }
+
+        function calculatePropertyTax(taxBase, isSeparateHouse) {
+            let tax = 0;
+            const multiplier = isSeparateHouse ? 4 : 1; // 별장은 4배
+
+            // 누진세율 적용
+            if (taxBase <= 60000000) {
+                tax = taxBase * 0.001 * multiplier;
+            } else if (taxBase <= 150000000) {
+                tax = 60000 * multiplier + (taxBase - 60000000) * 0.0015 * multiplier;
+            } else if (taxBase <= 300000000) {
+                tax = 60000 * multiplier + 135000 * multiplier + (taxBase - 150000000) * 0.0025 * multiplier;
+            } else {
+                tax = 60000 * multiplier + 135000 * multiplier + 375000 * multiplier + (taxBase - 300000000) * 0.004 * multiplier;
+            }
+
+            return Math.floor(tax);
+        }
+
+        function calculate() {
+            const officialPrice = parseInt(document.getElementById('officialPrice').value);
+            const isSeparateHouse = document.getElementById('houseType').value === 'separate';
+
+            if (!officialPrice || officialPrice <= 0) {
+                alert('공시가격을 올바르게 입력해주세요.');
+                return;
+            }
+
+            // 과세표준 = 공시가격 × 공정시장가액비율(60%)
+            const taxBase = Math.floor(officialPrice * 0.6);
+
+            // 재산세 계산
+            const propertyTax = calculatePropertyTax(taxBase, isSeparateHouse);
+
+            // 지방교육세 = 재산세 × 20%
+            const educationTax = Math.floor(propertyTax * 0.2);
+
+            // 도시지역분 = 재산세 × 14%
+            const urbanTax = Math.floor(propertyTax * 0.14);
+
+            // 총 세액
+            const totalTax = propertyTax + educationTax + urbanTax;
+
+            document.getElementById('resultPrice').textContent = formatNumber(officialPrice) + '원';
+            document.getElementById('resultTaxBase').textContent = formatNumber(taxBase) + '원';
+            document.getElementById('resultPropertyTax').textContent = formatNumber(propertyTax) + '원';
+            document.getElementById('resultEducationTax').textContent = formatNumber(educationTax) + '원';
+            document.getElementById('resultUrbanTax').textContent = formatNumber(urbanTax) + '원';
+            document.getElementById('resultTotal').textContent = formatNumber(totalTax) + '원';
+
+            document.getElementById('result').classList.add('show');
+        }
+    </script>
+</body>
+</html>

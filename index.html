@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부동산 취득세 계산기 - 2025년 최신 세율</title>
+    <meta name="description" content="2025년 최신 부동산 취득세 계산기. 주택, 토지, 상가 취득세율 자동 계산. 조정대상지역 중과세율 포함.">
+    <meta name="keywords" content="취득세, 취득세 계산기, 부동산 세금, 주택 취득세, 아파트 취득세, 2025년 취득세">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #667eea;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        nav a:hover, nav a.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .calculator {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 3px solid #667eea;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            background: #f0f7ff;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .result-label {
+            color: #666;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-top: 20px;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav a {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 부동산세금 계산기</h1>
+            <p class="subtitle">2025년 최신 세율로 정확하게 계산하세요</p>
+        </header>
+
+        <nav>
+            <a href="index.html" class="active">취득세</a>
+            <a href="capital-gains-tax.html">양도소득세</a>
+            <a href="property-tax.html">재산세</a>
+            <a href="registration-tax.html">등록세</a>
+            <a href="real-estate-guide.html">세금 가이드</a>
+        </nav>
+
+        <div class="content">
+            <h2>취득세 계산기</h2>
+            <p style="color: #666; margin: 20px 0;">주택, 토지, 상가 등 부동산 취득 시 납부할 세금을 계산합니다.</p>
+
+            <div class="calculator">
+                <div class="form-group">
+                    <label>부동산 유형</label>
+                    <select id="propertyType" onchange="updateForm()">
+                        <option value="house">주택</option>
+                        <option value="land">토지</option>
+                        <option value="commercial">상가/오피스텔</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="houseCountGroup">
+                    <label>주택 보유 수 (취득 후 기준)</label>
+                    <select id="houseCount" onchange="updateForm()">
+                        <option value="1">1주택 (무주택→1주택)</option>
+                        <option value="2">2주택 (1주택→2주택)</option>
+                        <option value="3">3주택 이상 (2주택→3주택)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="adjustmentAreaGroup">
+                    <label>조정대상지역 여부</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="adjustmentArea" value="no" checked> 일반지역</label>
+                        <label><input type="radio" name="adjustmentArea" value="yes"> 조정대상지역</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>취득가액 (원)</label>
+                    <input type="number" id="acquisitionPrice" placeholder="예: 500000000">
+                </div>
+
+                <button onclick="calculate()">취득세 계산하기</button>
+            </div>
+
+            <div class="result" id="result">
+                <h3 style="margin-bottom: 20px; color: #667eea;">계산 결과</h3>
+                <div class="result-item">
+                    <span class="result-label">취득가액</span>
+                    <span class="result-value" id="resultPrice">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">취득세율</span>
+                    <span class="result-value" id="resultRate">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">취득세</span>
+                    <span class="result-value" id="resultAcquisitionTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">농어촌특별세</span>
+                    <span class="result-value" id="resultRuralTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">지방교육세</span>
+                    <span class="result-value" id="resultEducationTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">총 납부세액</span>
+                    <span class="result-value" id="resultTotal">-</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>2025년 취득세율 안내</h3>
+                <ul>
+                    <li><strong>1주택:</strong> 6억원 이하 1~3%, 6억원 초과 일부 3%</li>
+                    <li><strong>2주택 (조정대상지역):</strong> 8%</li>
+                    <li><strong>3주택 이상 (조정대상지역):</strong> 12%</li>
+                    <li><strong>토지:</strong> 농지 3%, 일반 4%</li>
+                    <li><strong>상가/오피스텔:</strong> 4.6%</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ 유의사항</h4>
+                <p>• 조정대상지역은 정부 정책에 따라 변동됩니다</p>
+                <p>• 생애최초 주택 구입 시 감면 혜택이 있을 수 있습니다</p>
+                <p>• 정확한 세액은 관할 세무서 또는 세무사와 상담하시기 바랍니다</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ko-KR').format(num);
+        }
+
+        function updateForm() {
+            const propertyType = document.getElementById('propertyType').value;
+            const houseCountGroup = document.getElementById('houseCountGroup');
+            const adjustmentAreaGroup = document.getElementById('adjustmentAreaGroup');
+
+            if (propertyType === 'house') {
+                houseCountGroup.style.display = 'block';
+                adjustmentAreaGroup.style.display = 'block';
+            } else {
+                houseCountGroup.style.display = 'none';
+                adjustmentAreaGroup.style.display = 'none';
+            }
+        }
+
+        function calculate() {
+            const propertyType = document.getElementById('propertyType').value;
+            const price = parseInt(document.getElementById('acquisitionPrice').value);
+
+            if (!price || price <= 0) {
+                alert('취득가액을 올바르게 입력해주세요.');
+                return;
+            }
+
+            let taxRate = 0;
+            let ruralTaxRate = 0;
+
+            if (propertyType === 'house') {
+                const houseCount = document.getElementById('houseCount').value;
+                const isAdjustmentArea = document.querySelector('input[name="adjustmentArea"]:checked').value === 'yes';
+
+                if (houseCount === '1') {
+                    // 1주택: 6억 이하 1~3%, 6억 초과 일부 3%
+                    if (price <= 600000000) {
+                        if (price <= 60000000) taxRate = 0.01;
+                        else if (price <= 600000000) taxRate = 0.013;
+                    } else {
+                        // 간이 계산 (6억 초과분 3%)
+                        taxRate = 0.02;
+                    }
+                } else if (houseCount === '2') {
+                    if (isAdjustmentArea) {
+                        taxRate = 0.08;
+                        ruralTaxRate = 0.002; // 취득세의 20%
+                    } else {
+                        taxRate = 0.013;
+                    }
+                } else { // 3주택 이상
+                    if (isAdjustmentArea) {
+                        taxRate = 0.12;
+                        ruralTaxRate = 0.003; // 취득세의 20%
+                    } else {
+                        taxRate = 0.013;
+                    }
+                }
+            } else if (propertyType === 'land') {
+                taxRate = 0.04; // 일반 토지
+            } else if (propertyType === 'commercial') {
+                taxRate = 0.046; // 상가/오피스텔
+            }
+
+            const acquisitionTax = Math.floor(price * taxRate);
+            const ruralTax = ruralTaxRate > 0 ? Math.floor(price * ruralTaxRate) : 0;
+            const educationTax = Math.floor(acquisitionTax * 0.1); // 취득세의 10%
+            const total = acquisitionTax + ruralTax + educationTax;
+
+            document.getElementById('resultPrice').textContent = formatNumber(price) + '원';
+            document.getElementById('resultRate').textContent = (taxRate * 100).toFixed(2) + '%';
+            document.getElementById('resultAcquisitionTax').textContent = formatNumber(acquisitionTax) + '원';
+            document.getElementById('resultRuralTax').textContent = formatNumber(ruralTax) + '원';
+            document.getElementById('resultEducationTax').textContent = formatNumber(educationTax) + '원';
+            document.getElementById('resultTotal').textContent = formatNumber(total) + '원';
+
+            document.getElementById('result').classList.add('show');
+        }
+
+        // 초기 폼 상태 설정
+        updateForm();
+    </script>
+</body>
+</html>

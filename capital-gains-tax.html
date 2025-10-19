@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>양도소득세 계산기 - 부동산 양도세 자동 계산</title>
+    <meta name="description" content="부동산 양도소득세 간편 계산기. 양도차익, 보유기간 공제, 장기보유특별공제 자동 계산.">
+    <meta name="keywords" content="양도소득세, 양도세, 양도소득세 계산기, 부동산 양도세, 1세대 1주택 비과세">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #667eea;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        nav a:hover, nav a.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .calculator {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 3px solid #667eea;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            background: #f0f7ff;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .result-label {
+            color: #666;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-top: 20px;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+            margin-top: 20px;
+        }
+
+        .success-box h4 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav a {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 부동산세금 계산기</h1>
+            <p class="subtitle">2025년 최신 세율로 정확하게 계산하세요</p>
+        </header>
+
+        <nav>
+            <a href="index.html">취득세</a>
+            <a href="capital-gains-tax.html" class="active">양도소득세</a>
+            <a href="property-tax.html">재산세</a>
+            <a href="registration-tax.html">등록세</a>
+            <a href="real-estate-guide.html">세금 가이드</a>
+        </nav>
+
+        <div class="content">
+            <h2>양도소득세 계산기</h2>
+            <p style="color: #666; margin: 20px 0;">부동산 양도 시 발생하는 양도소득세를 간편하게 계산합니다.</p>
+
+            <div class="calculator">
+                <div class="form-group">
+                    <label>1세대 1주택 비과세 여부</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="oneHouse" value="yes" checked> 1세대 1주택 (2년 이상 보유)</label>
+                        <label><input type="radio" name="oneHouse" value="no"> 다주택자 또는 2년 미만</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>취득가액 (원)</label>
+                    <input type="number" id="acquisitionPrice" placeholder="예: 300000000">
+                </div>
+
+                <div class="form-group">
+                    <label>양도가액 (원)</label>
+                    <input type="number" id="salePrice" placeholder="예: 500000000">
+                </div>
+
+                <div class="form-group">
+                    <label>필요경비 (취득세, 중개수수료 등)</label>
+                    <input type="number" id="expenses" placeholder="예: 10000000">
+                </div>
+
+                <div class="form-group">
+                    <label>보유기간 (년)</label>
+                    <input type="number" id="holdingYears" placeholder="예: 5">
+                </div>
+
+                <button onclick="calculate()">양도소득세 계산하기</button>
+            </div>
+
+            <div class="result" id="result">
+                <h3 style="margin-bottom: 20px; color: #667eea;">계산 결과</h3>
+                <div class="result-item">
+                    <span class="result-label">양도가액</span>
+                    <span class="result-value" id="resultSalePrice">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">취득가액</span>
+                    <span class="result-value" id="resultAcquisitionPrice">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">필요경비</span>
+                    <span class="result-value" id="resultExpenses">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">양도차익</span>
+                    <span class="result-value" id="resultGain">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">장기보유특별공제</span>
+                    <span class="result-value" id="resultDeduction">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">과세표준</span>
+                    <span class="result-value" id="resultTaxBase">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">예상 양도소득세</span>
+                    <span class="result-value" id="resultTax">-</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>양도소득세 기본세율 (2025년)</h3>
+                <ul>
+                    <li><strong>1,200만원 이하:</strong> 6%</li>
+                    <li><strong>1,200만원 초과 ~ 4,600만원 이하:</strong> 15%</li>
+                    <li><strong>4,600만원 초과 ~ 8,800만원 이하:</strong> 24%</li>
+                    <li><strong>8,800만원 초과 ~ 1.5억원 이하:</strong> 35%</li>
+                    <li><strong>1.5억원 초과 ~ 3억원 이하:</strong> 38%</li>
+                    <li><strong>3억원 초과 ~ 5억원 이하:</strong> 40%</li>
+                    <li><strong>5억원 초과 ~ 10억원 이하:</strong> 42%</li>
+                    <li><strong>10억원 초과:</strong> 45%</li>
+                </ul>
+            </div>
+
+            <div class="success-box">
+                <h4>✅ 1세대 1주택 비과세 조건</h4>
+                <p>• 2년 이상 보유 및 거주</p>
+                <p>• 실거래가 12억원 이하 (초과분에 대해서만 과세)</p>
+                <p>• 조정대상지역은 거주요건 강화 (2년 → 2년)</p>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ 유의사항</h4>
+                <p>• 이 계산기는 간이 계산 방식입니다</p>
+                <p>• 실제 세액은 기본공제, 누진공제 등이 적용되어 차이가 있을 수 있습니다</p>
+                <p>• 다주택자는 중과세율(최대 75%)이 적용될 수 있습니다</p>
+                <p>• 정확한 세액은 세무사와 상담하시기 바랍니다</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ko-KR').format(num);
+        }
+
+        function calculateTax(taxBase) {
+            let tax = 0;
+            const brackets = [
+                { limit: 12000000, rate: 0.06, cumulative: 0 },
+                { limit: 46000000, rate: 0.15, cumulative: 720000 },
+                { limit: 88000000, rate: 0.24, cumulative: 5820000 },
+                { limit: 150000000, rate: 0.35, cumulative: 15900000 },
+                { limit: 300000000, rate: 0.38, cumulative: 37600000 },
+                { limit: 500000000, rate: 0.40, cumulative: 94600000 },
+                { limit: 1000000000, rate: 0.42, cumulative: 174600000 },
+                { limit: Infinity, rate: 0.45, cumulative: 384600000 }
+            ];
+
+            for (let i = 0; i < brackets.length; i++) {
+                if (taxBase <= brackets[i].limit) {
+                    const prevLimit = i === 0 ? 0 : brackets[i - 1].limit;
+                    tax = brackets[i].cumulative + (taxBase - prevLimit) * brackets[i].rate;
+                    break;
+                }
+            }
+
+            return Math.floor(tax);
+        }
+
+        function calculate() {
+            const isOneHouse = document.querySelector('input[name="oneHouse"]:checked').value === 'yes';
+            const acquisitionPrice = parseInt(document.getElementById('acquisitionPrice').value) || 0;
+            const salePrice = parseInt(document.getElementById('salePrice').value) || 0;
+            const expenses = parseInt(document.getElementById('expenses').value) || 0;
+            const holdingYears = parseInt(document.getElementById('holdingYears').value) || 0;
+
+            if (!acquisitionPrice || !salePrice || acquisitionPrice <= 0 || salePrice <= 0) {
+                alert('취득가액과 양도가액을 올바르게 입력해주세요.');
+                return;
+            }
+
+            const gain = salePrice - acquisitionPrice - expenses;
+
+            if (gain <= 0) {
+                alert('양도차익이 없습니다. (양도가액이 취득가액 및 필요경비의 합보다 작습니다)');
+                return;
+            }
+
+            // 1세대 1주택 비과세 체크
+            if (isOneHouse && salePrice <= 1200000000 && holdingYears >= 2) {
+                document.getElementById('resultSalePrice').textContent = formatNumber(salePrice) + '원';
+                document.getElementById('resultAcquisitionPrice').textContent = formatNumber(acquisitionPrice) + '원';
+                document.getElementById('resultExpenses').textContent = formatNumber(expenses) + '원';
+                document.getElementById('resultGain').textContent = formatNumber(gain) + '원';
+                document.getElementById('resultDeduction').textContent = '비과세';
+                document.getElementById('resultTaxBase').textContent = '0원';
+                document.getElementById('resultTax').textContent = '0원 (1세대 1주택 비과세)';
+
+                document.getElementById('result').classList.add('show');
+                return;
+            }
+
+            // 장기보유특별공제 (최대 30%)
+            let deductionRate = 0;
+            if (holdingYears >= 3) {
+                deductionRate = Math.min(0.08 + (holdingYears - 3) * 0.04, 0.30);
+            }
+            const deduction = Math.floor(gain * deductionRate);
+            const taxBase = gain - deduction;
+
+            // 양도소득세 계산
+            const tax = calculateTax(taxBase);
+
+            // 지방소득세 (10%)
+            const localTax = Math.floor(tax * 0.1);
+            const totalTax = tax + localTax;
+
+            document.getElementById('resultSalePrice').textContent = formatNumber(salePrice) + '원';
+            document.getElementById('resultAcquisitionPrice').textContent = formatNumber(acquisitionPrice) + '원';
+            document.getElementById('resultExpenses').textContent = formatNumber(expenses) + '원';
+            document.getElementById('resultGain').textContent = formatNumber(gain) + '원';
+            document.getElementById('resultDeduction').textContent = formatNumber(deduction) + '원 (' + (deductionRate * 100).toFixed(0) + '%)';
+            document.getElementById('resultTaxBase').textContent = formatNumber(taxBase) + '원';
+            document.getElementById('resultTax').textContent = formatNumber(totalTax) + '원 (지방세 포함)';
+
+            document.getElementById('result').classList.add('show');
+        }
+    </script>
+</body>
+</html>

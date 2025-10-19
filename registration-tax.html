@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>등록세 계산기 - 부동산 등기비용 자동 계산</title>
+    <meta name="description" content="부동산 등기 시 필요한 등록면허세 계산기. 소유권 이전, 보존, 근저당권 설정 비용 자동 계산.">
+    <meta name="keywords" content="등록세, 등록면허세, 등기비용, 소유권 이전, 근저당권, 법무사 비용">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #667eea;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        nav a:hover, nav a.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .calculator {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .result {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 3px solid #667eea;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            background: #f0f7ff;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .result-label {
+            color: #666;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+            margin-top: 30px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .info-box table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .info-box th, .info-box td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box th {
+            background: #bbdefb;
+            font-weight: 600;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-top: 20px;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav a {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 부동산세금 계산기</h1>
+            <p class="subtitle">2025년 최신 세율로 정확하게 계산하세요</p>
+        </header>
+
+        <nav>
+            <a href="index.html">취득세</a>
+            <a href="capital-gains-tax.html">양도소득세</a>
+            <a href="property-tax.html">재산세</a>
+            <a href="registration-tax.html" class="active">등록세</a>
+            <a href="real-estate-guide.html">세금 가이드</a>
+        </nav>
+
+        <div class="content">
+            <h2>등록면허세 계산기</h2>
+            <p style="color: #666; margin: 20px 0;">부동산 등기 시 납부하는 등록면허세를 계산합니다.</p>
+
+            <div class="calculator">
+                <div class="form-group">
+                    <label>등기 유형</label>
+                    <select id="registrationType" onchange="updateForm()">
+                        <option value="transfer">소유권 이전 (매매)</option>
+                        <option value="preservation">소유권 보존 (신축)</option>
+                        <option value="mortgage">근저당권 설정</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="priceGroup">
+                    <label id="priceLabel">거래가액 / 시가표준액 (원)</label>
+                    <input type="number" id="price" placeholder="예: 500000000">
+                </div>
+
+                <div class="form-group" id="mortgageGroup" style="display: none;">
+                    <label>채권최고액 (원)</label>
+                    <input type="number" id="mortgageAmount" placeholder="예: 300000000">
+                </div>
+
+                <button onclick="calculate()">등록면허세 계산하기</button>
+            </div>
+
+            <div class="result" id="result">
+                <h3 style="margin-bottom: 20px; color: #667eea;">계산 결과</h3>
+                <div class="result-item">
+                    <span class="result-label" id="resultPriceLabel">기준금액</span>
+                    <span class="result-value" id="resultPrice">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">등록면허세율</span>
+                    <span class="result-value" id="resultRate">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">등록면허세</span>
+                    <span class="result-value" id="resultRegistrationTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">지방교육세</span>
+                    <span class="result-value" id="resultEducationTax">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">국민주택채권</span>
+                    <span class="result-value" id="resultBond">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">예상 법무사 비용</span>
+                    <span class="result-value" id="resultLawyerFee">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">총 예상 비용</span>
+                    <span class="result-value" id="resultTotal">-</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>등록면허세율 (2025년)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>등기 유형</th>
+                            <th>세율</th>
+                            <th>지방교육세</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>소유권 이전 (매매)</td>
+                            <td>2.0%</td>
+                            <td>등록면허세의 20%</td>
+                        </tr>
+                        <tr>
+                            <td>소유권 보존 (신축)</td>
+                            <td>0.8%</td>
+                            <td>등록면허세의 20%</td>
+                        </tr>
+                        <tr>
+                            <td>근저당권 설정</td>
+                            <td>0.2%</td>
+                            <td>등록면허세의 20%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box" style="margin-top: 20px;">
+                <h3>국민주택채권 할인율 (2025년)</h3>
+                <p style="color: #555;">
+                    • 5년물: 약 15% 할인 (매입 후 즉시 매도 시)<br>
+                    • 10년물: 약 20% 할인 (매입 후 즉시 매도 시)<br>
+                    • 실제 할인율은 시장 상황에 따라 변동됩니다
+                </p>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ 유의사항</h4>
+                <p>• 법무사 비용은 지역 및 법무사 사무소마다 차이가 있습니다</p>
+                <p>• 국민주택채권은 의무 매입 후 할인 매도가 가능합니다</p>
+                <p>• 등기신청 전 정확한 비용은 법무사와 상담하시기 바랍니다</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ko-KR').format(num);
+        }
+
+        function updateForm() {
+            const registrationType = document.getElementById('registrationType').value;
+            const mortgageGroup = document.getElementById('mortgageGroup');
+            const priceLabel = document.getElementById('priceLabel');
+
+            if (registrationType === 'mortgage') {
+                mortgageGroup.style.display = 'block';
+                priceLabel.textContent = '부동산 가액 (원)';
+            } else {
+                mortgageGroup.style.display = 'none';
+                priceLabel.textContent = '거래가액 / 시가표준액 (원)';
+            }
+        }
+
+        function calculate() {
+            const registrationType = document.getElementById('registrationType').value;
+            const price = parseInt(document.getElementById('price').value);
+
+            if (!price || price <= 0) {
+                alert('금액을 올바르게 입력해주세요.');
+                return;
+            }
+
+            let registrationTaxRate = 0;
+            let baseAmount = price;
+
+            // 등록면허세율 결정
+            if (registrationType === 'transfer') {
+                registrationTaxRate = 0.02; // 소유권 이전 2.0%
+            } else if (registrationType === 'preservation') {
+                registrationTaxRate = 0.008; // 소유권 보존 0.8%
+            } else if (registrationType === 'mortgage') {
+                const mortgageAmount = parseInt(document.getElementById('mortgageAmount').value) || 0;
+                if (!mortgageAmount || mortgageAmount <= 0) {
+                    alert('채권최고액을 올바르게 입력해주세요.');
+                    return;
+                }
+                baseAmount = mortgageAmount;
+                registrationTaxRate = 0.002; // 근저당권 설정 0.2%
+            }
+
+            // 등록면허세 계산
+            const registrationTax = Math.floor(baseAmount * registrationTaxRate);
+
+            // 지방교육세 (등록면허세의 20%)
+            const educationTax = Math.floor(registrationTax * 0.2);
+
+            // 국민주택채권 (거래가액의 약 0.3% ~ 0.5%, 간이 계산)
+            let bondCost = 0;
+            if (registrationType === 'transfer' || registrationType === 'preservation') {
+                const bondRate = price <= 600000000 ? 0.003 : 0.005;
+                const bondFaceValue = Math.floor(price * bondRate);
+                bondCost = Math.floor(bondFaceValue * 0.85); // 15% 할인 가정
+            }
+
+            // 법무사 비용 (간이 계산)
+            let lawyerFee = 0;
+            if (registrationType === 'transfer') {
+                lawyerFee = Math.floor(price * 0.0015); // 약 0.15%
+                lawyerFee = Math.min(Math.max(lawyerFee, 500000), 2000000); // 50만원 ~ 200만원
+            } else if (registrationType === 'preservation') {
+                lawyerFee = Math.floor(price * 0.001); // 약 0.1%
+                lawyerFee = Math.min(Math.max(lawyerFee, 400000), 1500000); // 40만원 ~ 150만원
+            } else if (registrationType === 'mortgage') {
+                lawyerFee = 300000; // 근저당권 설정 약 30만원
+            }
+
+            // 총 비용
+            const totalCost = registrationTax + educationTax + bondCost + lawyerFee;
+
+            // 결과 표시
+            const resultPriceLabel = document.getElementById('resultPriceLabel');
+            if (registrationType === 'mortgage') {
+                resultPriceLabel.textContent = '채권최고액';
+            } else {
+                resultPriceLabel.textContent = '거래가액';
+            }
+
+            document.getElementById('resultPrice').textContent = formatNumber(baseAmount) + '원';
+            document.getElementById('resultRate').textContent = (registrationTaxRate * 100).toFixed(2) + '%';
+            document.getElementById('resultRegistrationTax').textContent = formatNumber(registrationTax) + '원';
+            document.getElementById('resultEducationTax').textContent = formatNumber(educationTax) + '원';
+            document.getElementById('resultBond').textContent = formatNumber(bondCost) + '원';
+            document.getElementById('resultLawyerFee').textContent = formatNumber(lawyerFee) + '원 (예상)';
+            document.getElementById('resultTotal').textContent = formatNumber(totalCost) + '원';
+
+            document.getElementById('result').classList.add('show');
+        }
+
+        // 초기 폼 상태 설정
+        updateForm();
+    </script>
+</body>
+</html>
